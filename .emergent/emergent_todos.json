@@ -1,34 +1,30 @@
 [
   {
-    "content": "Phase 2.1 Backend — TOTP 2FA: pyotp + qrcode, models, routes (setup/enable/disable/verify), enforcement at login",
-    "status": "completed"
+    "content": "Backend — add theme + typography fields to Settings (bg/surface/text/accent + serif/sans/mono font names + accent style)",
+    "status": "in_progress"
   },
   {
-    "content": "Phase 2.2 Backend — Retainers (Stripe Payment Links): models, CRUD routes for plans + per-athlete assignments",
-    "status": "completed"
+    "content": "Frontend — rewrite index.css + PublicLayout to apply theme CSS variables from settings (live re-theming)",
+    "status": "pending"
   },
   {
-    "content": "Phase 2.3 Backend — E-sign covenants: models, routes (create/send/sign), PDF stamping, audit",
-    "status": "completed"
+    "content": "Frontend — restyle Home to match reference exactly (dark obsidian hero, italic serif, gold last-word accent, right-side gold orb, uppercase nav, bottom meta strip)",
+    "status": "pending"
   },
   {
-    "content": "Phase 2.4 Backend — Mock email delivery: log to console + outbox UI, polished UI invite copy",
-    "status": "completed"
+    "content": "Frontend — restyle Services, Athletes, Orgs, Family, Approach, About, Press to dark theme matching reference",
+    "status": "pending"
   },
   {
-    "content": "Phase 2.5 Frontend — 2FA setup UI (Account + Settings) and 2FA challenge step in Login",
-    "status": "completed"
+    "content": "Frontend — add /orgs and /family route aliases (Sports Advisory → Organizations, Strategic Advisory → Family)",
+    "status": "pending"
   },
   {
-    "content": "Phase 2.6 Frontend — Admin Retainers + Covenants pages, Portal Retainer + Covenant signing UI",
-    "status": "completed"
+    "content": "Frontend — admin Theme panel in Settings (color pickers + font name inputs + live preview)",
+    "status": "pending"
   },
   {
-    "content": "Phase 2.7 Frontend — Inline-edit overlay on public site for users with edit_content (click-to-edit text, image swap, reorder, discard/publish)",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 2.8 Testing agent end-to-end — backend 65/65 (100%), frontend 95% (1 minor bug fixed: PressDetail InlineEditor)",
-    "status": "completed"
+    "content": "Test — verify reference fidelity and theme controls work",
+    "status": "pending"
   }
 ]

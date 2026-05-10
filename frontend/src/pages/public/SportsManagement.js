@@ -14,34 +14,34 @@ const STAGES = [
 export default function SportsManagement() {
   return (
     <PublicLayout>
-      <section className="section">
+      <section className="section" style={{ paddingTop: 120 }}>
         <div className="container-x">
-          <div className="eyebrow mb-6">sports &amp; athlete management</div>
-          <h1 className="display text-[56px] md:text-[104px] max-w-[1100px]">You are the asset.<br/>We are the infrastructure.</h1>
-          <p className="font-serif text-[20px] md:text-[24px] mt-12 max-w-[760px] leading-[1.5] text-[rgba(10,10,10,0.78)]">
+          <div className="eyebrow mb-8">Sports &amp; Athlete Management</div>
+          <h1 className="display text-[60px] md:text-[112px]" style={{ lineHeight: 0.98 }}>You are the asset.<br/>We are the <span className="gold">infrastructure.</span></h1>
+          <p className="font-serif italic mt-12 max-w-[720px] leading-[1.5]" style={{ fontSize: 22, color: 'var(--text-muted)' }}>
             Private management for elite athletes — from college and pre-draft through professional and post-career.
           </p>
         </div>
       </section>
-
-      <section className="section" style={{ background: 'var(--bone)', borderTop: '1px solid var(--gold-line)' }}>
-        <div className="container-x grid md:grid-cols-3 gap-x-12 gap-y-12">
-          {STAGES.map(s => (
-            <div key={s.n} className="pt-6" style={{ borderTop: '1px solid var(--gold-line)' }}>
-              <div className="meta-mono mb-3">stage {s.n}</div>
-              <div className="font-serif italic text-[26px] mb-3">{s.t}</div>
-              <p className="text-[15px] text-[rgba(10,10,10,0.72)] leading-[1.6]">{s.d}</p>
-            </div>
-          ))}
+      <section className="section" style={{ background: 'var(--surface)' }}>
+        <div className="container-x">
+          <ul className="meta-strip">
+            {STAGES.map(s => (
+              <li className="row" key={s.n}>
+                <div className="meta-mono" style={{ color: 'var(--accent)' }}>{s.n}</div>
+                <div className="font-serif italic text-[26px] md:text-[34px]">{s.t}</div>
+                <div className="desc text-[15px] leading-[1.6] max-w-[460px]" style={{ color: 'var(--text-muted)' }}>{s.d}</div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
-
-      <section className="section" style={{ background: 'var(--obsidian)', color: 'var(--ivory)' }}>
+      <section className="section">
         <div className="container-narrow text-center">
-          <p className="display text-[36px] md:text-[60px]">You handle the field.<br/>We handle everything else.</p>
+          <p className="display text-[36px] md:text-[60px]">You handle the field.<br/>We handle <span className="gold">everything else.</span></p>
           <div className="gold-rule my-14" />
           <h2 className="display text-[28px] md:text-[40px] mb-10">If you are building beyond the game,<br/>you need infrastructure.</h2>
-          <Link to="/contact" className="btn-line gold">request consideration</Link>
+          <Link to="/contact" className="btn-line gold">Request Consideration <span className="arrow">→</span></Link>
         </div>
       </section>
     </PublicLayout>

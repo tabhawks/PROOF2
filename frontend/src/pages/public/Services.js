@@ -14,35 +14,36 @@ const PRACTICES = [
 export default function Services() {
   return (
     <PublicLayout>
-      <section className="section">
+      <section className="section" style={{ paddingTop: 120 }}>
         <div className="container-x">
-          <div className="eyebrow mb-6">what we do</div>
-          <h1 className="display text-[56px] md:text-[100px] max-w-[1100px]">The private command center<br/>behind public excellence.</h1>
-          <p className="font-serif text-[20px] md:text-[24px] mt-12 max-w-[760px] text-[rgba(10,10,10,0.78)] leading-[1.5]">
+          <div className="eyebrow mb-8">What We Do</div>
+          <h1 className="display text-[60px] md:text-[112px]" style={{ lineHeight: 0.98 }}>The private command center<br/>behind public <span className="gold">excellence.</span></h1>
+          <p className="font-serif italic mt-12 max-w-[720px] leading-[1.5]" style={{ fontSize: 22, color: 'var(--text-muted)' }}>
             PROOF helps athletes make better decisions, avoid preventable risk, build stronger brands, coordinate the right advisors, evaluate opportunities, and plan beyond the game.
           </p>
         </div>
       </section>
 
-      <section className="section" style={{ borderTop: '1px solid var(--gold-line)' }}>
-        <div className="container-x grid md:grid-cols-2 gap-x-16 gap-y-14">
-          {PRACTICES.map(p => (
-            <div key={p.n} className="pt-6" style={{ borderTop: '1px solid var(--gold-line)' }}>
-              <div className="meta-mono mb-3">{p.n}</div>
-              <div className="font-serif italic text-[28px] md:text-[32px] mb-4">{p.t}</div>
-              <p className="text-[16px] leading-[1.6] text-[rgba(10,10,10,0.75)] max-w-[520px]">{p.d}</p>
-            </div>
-          ))}
+      <section className="section" style={{ background: 'var(--surface)', borderTop: '1px solid var(--hairline)' }}>
+        <div className="container-x">
+          <ul className="meta-strip">
+            {PRACTICES.map(p => (
+              <li className="row" key={p.n}>
+                <div className="meta-mono" style={{ color: 'var(--accent)' }}>{p.n}</div>
+                <div className="font-serif italic text-[28px] md:text-[36px]">{p.t}</div>
+                <div className="desc text-[15px] leading-[1.65] max-w-[460px]" style={{ color: 'var(--text-muted)' }}>{p.d}</div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <section className="section" style={{ background: 'var(--obsidian)', color: 'var(--ivory)' }}>
+      <section className="section">
         <div className="container-narrow text-center">
-          <div className="gold-rule mb-12" />
-          <p className="display text-[40px] md:text-[64px]">Most firms manage a lane.<br/>PROOF manages the architecture.</p>
-          <div className="gold-rule mt-12 mb-12" />
-          <h2 className="display text-[28px] md:text-[40px] mb-10">A coordinated strategy<br/>across all seven dimensions.</h2>
-          <Link to="/contact" className="btn-line gold">begin a private conversation</Link>
+          <p className="display text-[40px] md:text-[68px]">Most firms manage a lane.<br/>PROOF manages the <span className="gold">architecture.</span></p>
+          <div className="gold-rule my-14" />
+          <h2 className="display text-[28px] md:text-[44px] mb-12">A coordinated strategy<br/>across all seven dimensions.</h2>
+          <Link to="/contact" className="btn-line gold">Begin a private conversation <span className="arrow">→</span></Link>
         </div>
       </section>
     </PublicLayout>

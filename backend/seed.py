@@ -47,6 +47,17 @@ async def seed():
         'password_min_length': 8,
         'mfa_enforced_staff': False,
         'mfa_enforced_members': False,
+        'theme_bg': '#0A0A0A',
+        'theme_surface': '#141414',
+        'theme_text': '#F5F1EA',
+        'theme_text_muted': 'rgba(245,241,234,0.65)',
+        'theme_accent': '#C8A96A',
+        'theme_accent_soft': 'rgba(200,169,106,0.18)',
+        'theme_hairline': 'rgba(200,169,106,0.25)',
+        'font_serif': "'Cormorant Garamond', 'Times New Roman', serif",
+        'font_sans': "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        'font_mono': "'JetBrains Mono', ui-monospace, monospace",
+        'google_fonts_url': 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap',
         'updated_at': iso(now()),
     })
 

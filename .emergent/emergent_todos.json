@@ -1,0 +1,42 @@
+[
+  {
+    "content": "Phase 2A: Backend foundation — auth (JWT/bcrypt), RBAC, audit log, models, scheduler",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 2B: Backend routes — users, athletes, pages, posts, media, menus, documents, events, messages, announcements, invites, audit, analytics, settings, sitemap, robots",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 2C: Seed data — 4 staff + 6 members + 6 athletes + 3 pages + 3 posts + 6 docs + 4 events + 2 announcements",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 3A: Frontend design tokens + Tailwind config + fonts + base layouts + auth context + router",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 3B: Public site — 10 pages with block renderer matching reference",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 4: Member portal — Today/Documents/Calendar/Messages/News/Account",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 5: Admin/CMS — Dashboard/Roster/Pages/Posts/Block-editor/Media/Menus/Audit/Analytics/Settings",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 6: Brand deck — 27 token-gated slides",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 7: Inline editing on public site for edit_content cap",
+    "status": "cancelled"
+  },
+  {
+    "content": "Phase 8: Testing agent end-to-end + bug fixes + finish",
+    "status": "in_progress"
+  }
+]

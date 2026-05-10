@@ -5,13 +5,13 @@ function Eyebrow({ children }) {
   return <div className="eyebrow mb-3">{children}</div>;
 }
 
-export function HeroBlock({ data }) {
+export function HeroBlock({ data, blockId }) {
   return (
-    <section className="section" style={{ background: data.bg === 'dark' ? 'var(--obsidian)' : 'var(--ivory)', color: data.bg === 'dark' ? 'var(--ivory)' : 'var(--obsidian)' }}>
+    <section data-cms-block={blockId} className="section" style={{ background: data.bg === 'dark' ? 'var(--obsidian)' : 'var(--ivory)', color: data.bg === 'dark' ? 'var(--ivory)' : 'var(--obsidian)' }}>
       <div className="container-x">
-        {data.eyebrow && <div className={`eyebrow ${data.bg === 'dark' ? 'on-dark' : ''} mb-6`}>{data.eyebrow}</div>}
-        <h1 className="display text-[56px] md:text-[96px] tracking-tight max-w-[1100px]">{data.title}</h1>
-        {data.subtitle && <p className="font-serif text-[22px] md:text-[26px] leading-[1.45] mt-8 max-w-[760px] text-[rgba(10,10,10,0.78)]" style={{ color: data.bg === 'dark' ? 'rgba(245,241,234,0.78)' : undefined }}>{data.subtitle}</p>}
+        {data.eyebrow && <div className={`eyebrow ${data.bg === 'dark' ? 'on-dark' : ''} mb-6`} data-cms-field="eyebrow">{data.eyebrow}</div>}
+        <h1 className="display text-[56px] md:text-[96px] tracking-tight max-w-[1100px]" data-cms-field="title">{data.title}</h1>
+        {data.subtitle && <p className="font-serif text-[22px] md:text-[26px] leading-[1.45] mt-8 max-w-[760px] text-[rgba(10,10,10,0.78)]" style={{ color: data.bg === 'dark' ? 'rgba(245,241,234,0.78)' : undefined }} data-cms-field="subtitle">{data.subtitle}</p>}
         {(data.cta_label || data.secondary_label) && (
           <div className="mt-12 flex flex-wrap gap-4">
             {data.cta_label && <Link to={data.cta_href || '/contact'} className={`btn-line gold`}>{data.cta_label}</Link>}
@@ -23,37 +23,37 @@ export function HeroBlock({ data }) {
   );
 }
 
-export function HeadingBlock({ data }) {
+export function HeadingBlock({ data, blockId }) {
   const level = Math.min(Math.max(parseInt(data.level || 2, 10), 1), 6);
   const Tag = `h${level}`;
   const cls = level <= 2 ? 'display text-[42px] md:text-[64px]' : 'font-serif italic text-[28px] md:text-[36px]';
   return (
-    <section className="section-tight">
+    <section data-cms-block={blockId} className="section-tight">
       <div className="container-x">
         {data.eyebrow && <Eyebrow>{data.eyebrow}</Eyebrow>}
-        <Tag className={cls + ' tracking-tight'}>{data.text}</Tag>
+        <Tag className={cls + ' tracking-tight'} data-cms-field="text">{data.text}</Tag>
       </div>
     </section>
   );
 }
 
-export function ParagraphBlock({ data }) {
+export function ParagraphBlock({ data, blockId }) {
   return (
-    <section className="section-tight">
+    <section data-cms-block={blockId} className="section-tight">
       <div className="container-narrow">
-        <p className="font-serif text-[20px] md:text-[22px] leading-[1.55] text-[rgba(10,10,10,0.85)]">{data.text}</p>
+        <p className="font-serif text-[20px] md:text-[22px] leading-[1.55] text-[rgba(10,10,10,0.85)]" data-cms-field="text">{data.text}</p>
       </div>
     </section>
   );
 }
 
-export function QuoteBlock({ data }) {
+export function QuoteBlock({ data, blockId }) {
   return (
-    <section className="section">
+    <section data-cms-block={blockId} className="section">
       <div className="container-narrow text-center">
         <div className="gold-rule mb-12" />
-        <blockquote className="display text-[36px] md:text-[56px] leading-[1.1]">{data.text}</blockquote>
-        {data.attribution && <div className="meta-mono mt-8">— {data.attribution}</div>}
+        <blockquote className="display text-[36px] md:text-[56px] leading-[1.1]" data-cms-field="text">{data.text}</blockquote>
+        {data.attribution && <div className="meta-mono mt-8">— <span data-cms-field="attribution">{data.attribution}</span></div>}
         <div className="gold-rule mt-12" />
       </div>
     </section>
@@ -272,10 +272,10 @@ export function BlockRenderer({ blocks }) {
   return blocks.map((b, i) => {
     const data = b.data || {};
     switch (b.type) {
-      case 'hero': return <HeroBlock key={b.id || i} data={data} />;
-      case 'heading': return <HeadingBlock key={b.id || i} data={data} />;
-      case 'paragraph': return <ParagraphBlock key={b.id || i} data={data} />;
-      case 'quote': return <QuoteBlock key={b.id || i} data={data} />;
+      case 'hero': return <HeroBlock key={b.id || i} data={data} blockId={b.id} />;
+      case 'heading': return <HeadingBlock key={b.id || i} data={data} blockId={b.id} />;
+      case 'paragraph': return <ParagraphBlock key={b.id || i} data={data} blockId={b.id} />;
+      case 'quote': return <QuoteBlock key={b.id || i} data={data} blockId={b.id} />;
       case 'image': return <ImageBlock key={b.id || i} data={data} />;
       case 'image_text': return <ImageTextBlock key={b.id || i} data={data} />;
       case 'two_col': return <TwoColBlock key={b.id || i} data={data} />;

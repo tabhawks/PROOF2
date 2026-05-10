@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import TwoFactorPanel from '@/components/auth/TwoFactorPanel';
 
 export default function AdminSettings() {
   const [s, setS] = useState(null);
@@ -33,6 +34,9 @@ export default function AdminSettings() {
         </div>
         <button onClick={save} className="btn-line gold">save settings</button>
         {msg && <span className="ml-4 meta-mono" style={{ color: 'var(--gold)' }}>{msg}</span>}
+      </div>
+      <div className="mt-16 max-w-[800px] pt-8" style={{ borderTop: '1px solid var(--gold-line)' }}>
+        <TwoFactorPanel />
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import PublicLayout from '@/components/site/PublicLayout';
 import { BlockRenderer } from '@/components/blocks/BlockRenderer';
+import InlineEditor from '@/components/cms/InlineEditor';
 import { api } from '@/lib/api';
 
 function fmtDate(s) {

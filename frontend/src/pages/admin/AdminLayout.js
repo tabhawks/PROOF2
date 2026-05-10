@@ -20,6 +20,11 @@ const GROUPS = [
     { to: '/admin/documents', label: 'Documents', key: 'docs' },
     { to: '/admin/calendar', label: 'Calendar', key: 'cal' },
     { to: '/admin/messages', label: 'Messages', key: 'msg' },
+    { to: '/admin/outbox', label: 'Email Outbox', key: 'outbox' },
+  ]},
+  { label: 'Billing', items: [
+    { to: '/admin/retainers', label: 'Retainers', key: 'retainers' },
+    { to: '/admin/covenants', label: 'Covenants', key: 'covenants' },
   ]},
   { label: 'Governance', items: [
     { to: '/admin/audit', label: 'Audit Log', key: 'audit' },

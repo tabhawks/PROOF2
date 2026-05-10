@@ -444,6 +444,330 @@ class ProofAPITester:
             description="Member should be forbidden from settings"
         )
 
+    def test_2fa_flow(self):
+        """Test 2FA setup, enable, login, and disable"""
+        print(f"\n{'='*60}")
+        print("🔐 TESTING 2FA (Phase 2)")
+        print(f"{'='*60}")
+        
+        if 'member' not in self.tokens:
+            print("⚠️  Skipping - no member token")
+            return
+        
+        # Check 2FA status
+        success, status = self.test("2FA status", "GET", "auth/2fa/status", 200, token=self.tokens['member'])
+        if success:
+            print(f"   2FA enabled: {status.get('enabled', False)}")
+            print(f"   2FA enforced: {status.get('enforced', False)}")
+        
+        # Setup 2FA
+        success, setup = self.test("2FA setup", "POST", "auth/2fa/setup", 200, token=self.tokens['member'])
+        if success and 'secret' in setup:
+            print(f"   Secret: {setup['secret'][:10]}...")
+            print(f"   QR code: {'present' if setup.get('qr_png_data_url') else 'missing'}")
+            
+            # Generate TOTP code
+            try:
+                import pyotp
+                totp = pyotp.TOTP(setup['secret'])
+                code = totp.now()
+                print(f"   Generated code: {code}")
+                
+                # Enable 2FA
+                success, enable_resp = self.test(
+                    "2FA enable",
+                    "POST",
+                    "auth/2fa/enable",
+                    200,
+                    data={"code": code},
+                    token=self.tokens['member']
+                )
+                if success:
+                    print(f"   ✅ 2FA enabled: {enable_resp.get('enabled', False)}")
+                    
+                    # Test 2FA login flow
+                    print("\n   Testing 2FA login flow...")
+                    # First attempt without code (should return requires_2fa)
+                    success, login_resp = self.test(
+                        "2FA login without code",
+                        "POST",
+                        "auth/2fa/login",
+                        401,
+                        data={"email": "devon@member.proof", "password": "Proof2026!"}
+                    )
+                    
+                    # Second attempt with correct code
+                    new_code = totp.now()
+                    success, login_resp = self.test(
+                        "2FA login with code",
+                        "POST",
+                        "auth/2fa/login",
+                        200,
+                        data={"email": "devon@member.proof", "password": "Proof2026!", "code": new_code}
+                    )
+                    if success:
+                        print(f"   ✅ 2FA login successful")
+                    
+                    # Test with bad code
+                    success, bad_resp = self.test(
+                        "2FA login with bad code",
+                        "POST",
+                        "auth/2fa/login",
+                        401,
+                        data={"email": "devon@member.proof", "password": "Proof2026!", "code": "000000"}
+                    )
+                    
+                    # Disable 2FA
+                    disable_code = totp.now()
+                    success, disable_resp = self.test(
+                        "2FA disable",
+                        "POST",
+                        "auth/2fa/disable",
+                        200,
+                        data={"code": disable_code},
+                        token=self.tokens['member']
+                    )
+                    if success:
+                        print(f"   ✅ 2FA disabled: {not disable_resp.get('enabled', True)}")
+                
+            except ImportError:
+                print("   ⚠️  pyotp not available, skipping code generation tests")
+
+    def test_retainer_plans(self):
+        """Test retainer plans CRUD"""
+        print(f"\n{'='*60}")
+        print("💳 TESTING RETAINER PLANS (Phase 2)")
+        print(f"{'='*60}")
+        
+        if 'owner' not in self.tokens:
+            print("⚠️  Skipping - no owner token")
+            return
+        
+        # List plans
+        success, plans = self.test("List retainer plans", "GET", "billing/plans", 200, token=self.tokens['owner'])
+        if success:
+            print(f"   Found {len(plans)} plans")
+            if len(plans) < 3:
+                print(f"   ⚠️  Expected >= 3 seeded plans, got {len(plans)}")
+            else:
+                print(f"   ✅ Found expected seeded plans: {', '.join([p['name'] for p in plans[:3]])}")
+        
+        # Create a new plan
+        success, new_plan = self.test(
+            "Create retainer plan",
+            "POST",
+            "billing/plans",
+            200,
+            data={
+                "name": "Test Tier",
+                "tagline": "Test tier for automated testing",
+                "monthly_amount_usd": 7500,
+                "currency": "USD",
+                "features": ["Test feature 1", "Test feature 2"],
+                "payment_link_url": "https://buy.stripe.com/test_link",
+                "order": 99,
+                "active": True
+            },
+            token=self.tokens['owner']
+        )
+        if success and 'id' in new_plan:
+            plan_id = new_plan['id']
+            print(f"   ✅ Created plan: {plan_id}")
+            
+            # Update the plan
+            success, updated = self.test(
+                "Update retainer plan",
+                "PATCH",
+                f"billing/plans/{plan_id}",
+                200,
+                data={"monthly_amount_usd": 8000},
+                token=self.tokens['owner']
+            )
+            if success:
+                print(f"   ✅ Updated plan amount to ${updated.get('monthly_amount_usd', 0)}")
+            
+            # Delete the plan
+            success, _ = self.test(
+                "Delete retainer plan",
+                "DELETE",
+                f"billing/plans/{plan_id}",
+                200,
+                token=self.tokens['owner']
+            )
+            if success:
+                print(f"   ✅ Deleted test plan")
+
+    def test_retainer_assignments(self):
+        """Test retainer assignments"""
+        print(f"\n{'='*60}")
+        print("📋 TESTING RETAINER ASSIGNMENTS (Phase 2)")
+        print(f"{'='*60}")
+        
+        if 'owner' not in self.tokens:
+            print("⚠️  Skipping - no owner token")
+            return
+        
+        # List retainers as owner
+        success, retainers = self.test("List retainers (owner)", "GET", "billing/retainers", 200, token=self.tokens['owner'])
+        if success:
+            print(f"   Found {len(retainers)} retainers")
+            if len(retainers) < 3:
+                print(f"   ⚠️  Expected >= 3 seeded retainers, got {len(retainers)}")
+            else:
+                print(f"   ✅ Found seeded retainers with populated plan and athlete")
+                for r in retainers[:3]:
+                    print(f"      - {r.get('athlete', {}).get('name', 'N/A')} → {r.get('plan', {}).get('name', 'N/A')} (${r.get('plan', {}).get('monthly_amount_usd', 0)}/mo)")
+        
+        # List retainers as member (should only see their own)
+        if 'member' in self.tokens:
+            success, member_retainers = self.test("List retainers (member)", "GET", "billing/retainers", 200, token=self.tokens['member'])
+            if success:
+                print(f"   Member sees {len(member_retainers)} retainer(s)")
+                if len(member_retainers) > 0:
+                    print(f"   ✅ Member can see their retainer: {member_retainers[0].get('plan', {}).get('name', 'N/A')}")
+        
+        # Get athletes and plans for creating a new retainer
+        success, athletes = self.test("Get athletes for retainer", "GET", "ops/athletes", 200, token=self.tokens['owner'])
+        success, plans = self.test("Get plans for retainer", "GET", "billing/plans", 200, token=self.tokens['owner'])
+        
+        if athletes and plans:
+            # Create a new retainer assignment
+            success, new_retainer = self.test(
+                "Create retainer assignment",
+                "POST",
+                "billing/retainers",
+                200,
+                data={
+                    "athlete_id": athletes[0]['id'],
+                    "plan_id": plans[0]['id'],
+                    "status": "pending",
+                    "note": "Test retainer assignment"
+                },
+                token=self.tokens['owner']
+            )
+            if success and 'id' in new_retainer:
+                retainer_id = new_retainer['id']
+                print(f"   ✅ Created retainer: {retainer_id}")
+                
+                # Update status
+                success, updated = self.test(
+                    "Update retainer status",
+                    "PATCH",
+                    f"billing/retainers/{retainer_id}",
+                    200,
+                    data={"status": "active"},
+                    token=self.tokens['owner']
+                )
+                if success:
+                    print(f"   ✅ Updated retainer status to {updated.get('status', 'N/A')}")
+
+    def test_covenants(self):
+        """Test covenants (e-sign)"""
+        print(f"\n{'='*60}")
+        print("📜 TESTING COVENANTS (Phase 2)")
+        print(f"{'='*60}")
+        
+        if 'owner' not in self.tokens:
+            print("⚠️  Skipping - no owner token")
+            return
+        
+        # List covenants as owner
+        success, covenants = self.test("List covenants (owner)", "GET", "billing/covenants", 200, token=self.tokens['owner'])
+        if success:
+            print(f"   Found {len(covenants)} covenants")
+            if len(covenants) < 2:
+                print(f"   ⚠️  Expected >= 2 seeded covenants, got {len(covenants)}")
+            else:
+                print(f"   ✅ Found seeded covenants:")
+                for c in covenants[:2]:
+                    print(f"      - {c.get('member', {}).get('name', 'N/A')} → {c.get('status', 'N/A')}")
+        
+        # List covenants as member (should only see their own)
+        if 'member' in self.tokens:
+            success, member_covenants = self.test("List covenants (member)", "GET", "billing/covenants", 200, token=self.tokens['member'])
+            if success:
+                print(f"   Member sees {len(member_covenants)} covenant(s)")
+        
+        # Get members for creating a covenant
+        success, members = self.test("Get members for covenant", "GET", "admin/users?role_class=member", 200, token=self.tokens['owner'])
+        
+        if members:
+            # Create a new covenant
+            success, new_covenant = self.test(
+                "Create covenant",
+                "POST",
+                "billing/covenants",
+                200,
+                data={
+                    "member_id": members[0]['id'],
+                    "title": "Test Covenant of Engagement",
+                    "body": "Test covenant body for automated testing."
+                },
+                token=self.tokens['owner']
+            )
+            if success and 'id' in new_covenant:
+                covenant_id = new_covenant['id']
+                print(f"   ✅ Created covenant: {covenant_id} (status: {new_covenant.get('status', 'N/A')})")
+                
+                # Test signing (as member if we have a member token and the covenant is for them)
+                # For now, just test PDF download
+                success, pdf_resp = self.test(
+                    "Download covenant PDF",
+                    "GET",
+                    f"billing/covenants/{covenant_id}/pdf",
+                    200,
+                    token=self.tokens['owner']
+                )
+                if success:
+                    print(f"   ✅ PDF download endpoint works")
+
+    def test_email_outbox(self):
+        """Test mock email outbox"""
+        print(f"\n{'='*60}")
+        print("📬 TESTING EMAIL OUTBOX (Phase 2)")
+        print(f"{'='*60}")
+        
+        if 'owner' not in self.tokens:
+            print("⚠️  Skipping - no owner token")
+            return
+        
+        # List outbox
+        success, outbox = self.test("List email outbox", "GET", "billing/outbox", 200, token=self.tokens['owner'])
+        if success:
+            print(f"   Found {len(outbox)} queued emails")
+            if len(outbox) > 0:
+                print(f"   ✅ Sample email:")
+                email = outbox[0]
+                print(f"      - To: {email.get('to_email', 'N/A')}")
+                print(f"      - Subject: {email.get('subject', 'N/A')}")
+                print(f"      - CTA URL: {email.get('cta_url', 'N/A')}")
+            else:
+                print(f"   ⚠️  No emails in outbox (expected at least invite emails from seed)")
+        
+        # Create an invite to trigger email outbox entry
+        test_email = f"test-outbox-{datetime.now().strftime('%H%M%S')}@proof.firm"
+        success, invite = self.test(
+            "Create invite (triggers outbox)",
+            "POST",
+            "admin/invites",
+            200,
+            data={
+                "email": test_email,
+                "name": "Test Outbox User",
+                "role": "editor"
+            },
+            token=self.tokens['owner']
+        )
+        if success:
+            print(f"   ✅ Invite created, checking outbox...")
+            # Check outbox again
+            success, outbox2 = self.test("List email outbox (after invite)", "GET", "billing/outbox", 200, token=self.tokens['owner'])
+            if success and len(outbox2) > len(outbox):
+                print(f"   ✅ New email in outbox (count increased from {len(outbox)} to {len(outbox2)})")
+                new_email = [e for e in outbox2 if e.get('to_email') == test_email]
+                if new_email:
+                    print(f"   ✅ Found invite email with CTA: {new_email[0].get('cta_url', 'N/A')}")
+
     def print_summary(self):
         """Print test summary"""
         print(f"\n{'='*60}")
@@ -489,6 +813,13 @@ def main():
     tester.test_portal_member()
     tester.test_contact_inquiry()
     tester.test_rbac()
+    
+    # Phase 2 tests
+    tester.test_2fa_flow()
+    tester.test_retainer_plans()
+    tester.test_retainer_assignments()
+    tester.test_covenants()
+    tester.test_email_outbox()
     
     return tester.print_summary()
 

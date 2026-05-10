@@ -46,6 +46,11 @@ import AdminAnnouncements from '@/pages/admin/Announcements';
 import AdminAuditLog from '@/pages/admin/AuditLog';
 import AdminAnalytics from '@/pages/admin/Analytics';
 import AdminSettings from '@/pages/admin/Settings';
+import AdminRetainers from '@/pages/admin/Retainers';
+import AdminCovenants from '@/pages/admin/Covenants';
+import AdminOutbox from '@/pages/admin/Outbox';
+import PortalCovenants from '@/pages/portal/Covenants';
+import PortalRetainer from '@/pages/portal/Retainer';
 
 function NotFound() {
   return <div style={{ minHeight: '70vh', display: 'grid', placeItems: 'center', background: 'var(--ivory)' }}><div className="text-center"><h1 className="display text-[80px]">404</h1><p className="meta-mono">A page that does not exist is the most private of all.</p><a href="/" className="btn-line gold mt-8 inline-flex">return home</a></div></div>;
@@ -86,6 +91,8 @@ function App() {
             <Route path="calendar" element={<PortalCalendar />} />
             <Route path="messages" element={<PortalMessages />} />
             <Route path="news" element={<PortalNews />} />
+            <Route path="covenants" element={<PortalCovenants />} />
+            <Route path="retainer" element={<PortalRetainer />} />
             <Route path="account" element={<PortalAccount />} />
           </Route>
 
@@ -108,6 +115,9 @@ function App() {
             <Route path="audit" element={<AdminAuditLog />} />
             <Route path="analytics" element={<AdminAnalytics />} />
             <Route path="settings" element={<AdminSettings />} />
+            <Route path="retainers" element={<AdminRetainers />} />
+            <Route path="covenants" element={<AdminCovenants />} />
+            <Route path="outbox" element={<AdminOutbox />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

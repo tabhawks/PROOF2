@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 
@@ -8,6 +8,8 @@ const NAV = [
   { to: '/portal/calendar', label: 'Calendar', key: 'cal' },
   { to: '/portal/messages', label: 'Messages', key: 'msg' },
   { to: '/portal/news', label: 'News', key: 'news' },
+  { to: '/portal/covenants', label: 'Covenants', key: 'cov' },
+  { to: '/portal/retainer', label: 'Retainer', key: 'ret' },
   { to: '/portal/account', label: 'My Account', key: 'acct' },
 ];
 

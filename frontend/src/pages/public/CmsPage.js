@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import PublicLayout from '@/components/site/PublicLayout';
 import { BlockRenderer } from '@/components/blocks/BlockRenderer';
+import InlineEditor from '@/components/cms/InlineEditor';
 import { api } from '@/lib/api';
 
 export default function CmsPage() {
@@ -18,12 +19,13 @@ export default function CmsPage() {
     <PublicLayout>
       <section className="section">
         <div className="container-x">
-          <div className="eyebrow mb-6">{page.locale}</div>
-          <h1 className="display text-[56px] md:text-[100px] max-w-[1100px]">{page.title}</h1>
-          {page.seo_description && <p className="font-serif text-[20px] md:text-[22px] mt-10 max-w-[720px] text-[rgba(10,10,10,0.78)] leading-[1.5]">{page.seo_description}</p>}
+          <div className="eyebrow mb-6" data-cms-field="locale">{page.locale}</div>
+          <h1 className="display text-[56px] md:text-[100px] max-w-[1100px]" data-cms-field="title">{page.title}</h1>
+          {page.seo_description && <p className="font-serif text-[20px] md:text-[22px] mt-10 max-w-[720px] text-[rgba(10,10,10,0.78)] leading-[1.5]" data-cms-field="seo_description">{page.seo_description}</p>}
         </div>
       </section>
       <BlockRenderer blocks={page.blocks} />
+      <InlineEditor resourceType="page" slug={slug} />
     </PublicLayout>
   );
 }

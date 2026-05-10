@@ -108,6 +108,8 @@ async def create_invite(payload: dict, actor: dict = Depends(require_cap('manage
     }
     await db.invites.insert_one(invite)
     await write_audit(actor, 'create', 'invite', invite['id'], None, serialize_doc(invite))
+    # Mock email: log to outbox so admins can see what would have been sent
+    await _outbox_invite_email(invite, actor)
     return serialize_doc(invite)
 
 
@@ -123,6 +125,7 @@ async def resend_invite(invite_id: str, actor: dict = Depends(require_cap('manag
         'expires_at': (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
     }})
     await write_audit(actor, 'resend', 'invite', invite_id)
+    await _outbox_invite_email({**inv, 'token': new_token}, actor, resend=True)
     return {'ok': True, 'token': new_token}
 
 
@@ -209,6 +212,37 @@ async def update_settings(payload: dict, user: dict = Depends(require_cap('manag
     after = await db.settings.find_one({'id': 'singleton'}, {'_id': 0})
     await write_audit(user, 'update', 'settings', 'singleton', serialize_doc(before), serialize_doc(after))
     return serialize_doc(after)
+
+
+# ---------- Mock email outbox helper ----------
+import logging
+_emaillog = logging.getLogger('proof.email')
+
+
+async def _outbox_invite_email(invite: dict, actor: Optional[dict], resend: bool = False):
+    """Mock email \u2014 persist to outbox + log to backend stdout."""
+    accept_url = f"/onboarding?invite={invite['token']}"
+    body = (
+        f"You have been invited to PROOF as {invite['role']}.\n\n"
+        f"Accept your invitation:\n{accept_url}\n\n"
+        f"This invitation expires in 7 days.\n"
+    )
+    entry = {
+        'id': secrets.token_hex(12),
+        'kind': 'invite_resend' if resend else 'invite',
+        'to_email': invite['email'],
+        'to_name': invite['name'],
+        'subject': ('PROOF \u2014 your invitation' + (' (resend)' if resend else '')),
+        'body': body,
+        'cta_url': accept_url,
+        'token': invite['token'],
+        'invite_id': invite['id'],
+        'sent_by': actor['email'] if actor else None,
+        'status': 'queued',  # mock \u2014 never actually sent\n
+        'created_at': datetime.now(timezone.utc).isoformat(),
+    }
+    await db.email_outbox.insert_one(entry)
+    _emaillog.info(f"[MOCK EMAIL] To: {entry['to_email']} | Subject: {entry['subject']} | Link: {accept_url}")
 
 
 # ---------- Public site settings (read) ----------

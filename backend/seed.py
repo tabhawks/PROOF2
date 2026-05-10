@@ -25,6 +25,7 @@ COLLECTIONS = [
     'profiles', 'athletes', 'athlete_members', 'pages', 'posts', 'revisions', 'media',
     'menus', 'documents', 'events', 'announcements', 'message_threads', 'messages',
     'invites', 'audit_log', 'analytics_events', 'inquiries', 'categories', 'tags', 'settings',
+    'retainer_plans', 'retainers', 'covenants', 'email_outbox',
 ]
 
 
@@ -368,6 +369,68 @@ async def seed():
              'body': 'Received. Reviewing tonight.', 'read_by': [member_ids[member_idx]],
              'created_at': iso(now() - timedelta(days=1))},
         ])
+
+    print('[seed] retainer plans (3 tiers)...')
+    plans = [
+        {'name': 'Founders', 'tagline': 'For early visibility and pre-draft positioning.',
+         'monthly_amount_usd': 5000, 'features': ['Strategist coordination', 'Reputation baseline', 'Brand readiness'],
+         'payment_link_url': 'https://buy.stripe.com/test_founders_link', 'order': 1},
+        {'name': 'Principal', 'tagline': 'For active professional careers.',
+         'monthly_amount_usd': 12500, 'features': ['Full PROOF model', 'Advisor coordination', 'Quarterly reviews', 'Sensitive matter desk'],
+         'payment_link_url': 'https://buy.stripe.com/test_principal_link', 'order': 2},
+        {'name': 'Family Office', 'tagline': 'Long-arc, multi-generational architecture.',
+         'monthly_amount_usd': 25000, 'features': ['Family systems', 'Legacy architecture', 'Ownership planning', 'Direct partner access'],
+         'payment_link_url': 'https://buy.stripe.com/test_family_link', 'order': 3},
+    ]
+    plan_ids = []
+    for p in plans:
+        pid = secrets.token_hex(8)
+        plan_ids.append(pid)
+        await db.retainer_plans.insert_one({
+            'id': pid, 'currency': 'USD', 'active': True,
+            'created_at': iso(now()), 'updated_at': iso(now()),
+            **p,
+        })
+
+    print('[seed] sample retainer assignments...')
+    # Devon -> Founders, Amara -> Principal, Cassian -> Family Office
+    await db.retainers.insert_many([
+        {'id': secrets.token_hex(12), 'athlete_id': athlete_ids[0], 'plan_id': plan_ids[0],
+         'status': 'active', 'started_at': iso(now() - timedelta(days=120)), 'ended_at': None,
+         'note': 'Pre-draft engagement.', 'created_by': staff_ids['admin'],
+         'created_at': iso(now() - timedelta(days=120)), 'updated_at': iso(now())},
+        {'id': secrets.token_hex(12), 'athlete_id': athlete_ids[1], 'plan_id': plan_ids[1],
+         'status': 'active', 'started_at': iso(now() - timedelta(days=300)), 'ended_at': None,
+         'note': 'Active professional.', 'created_by': staff_ids['admin'],
+         'created_at': iso(now() - timedelta(days=300)), 'updated_at': iso(now())},
+        {'id': secrets.token_hex(12), 'athlete_id': athlete_ids[4], 'plan_id': plan_ids[2],
+         'status': 'active', 'started_at': iso(now() - timedelta(days=540)), 'ended_at': None,
+         'note': 'Multi-generation engagement.', 'created_by': staff_ids['admin'],
+         'created_at': iso(now() - timedelta(days=540)), 'updated_at': iso(now())},
+    ])
+
+    print('[seed] sample covenants...')
+    # Devon: signed; Amara: sent (awaiting signature); Hollis: draft
+    devon_member_id = member_ids[0]
+    amara_member_id = member_ids[1]
+    helena_member_id = member_ids[2]
+    await db.covenants.insert_many([
+        {'id': secrets.token_hex(12), 'title': 'Covenant of Engagement \u2014 Marsh',
+         'body': 'PROOF Covenant of Engagement.\n\nFor: Devon Marsh.\n\nThis covenant outlines the private relationship between Member and Firm.',
+         'member_id': devon_member_id, 'athlete_id': athlete_ids[0], 'status': 'signed',
+         'created_by': staff_ids['admin'], 'sent_at': iso(now() - timedelta(days=110)),
+         'signed_at': iso(now() - timedelta(days=108)),
+         'signature': {'typed_name': 'Devon Marsh', 'canvas_data_url': '',
+                       'ip': '198.51.100.42', 'ua': 'iPhone Safari',
+                       'signed_at': iso(now() - timedelta(days=108))},
+         'created_at': iso(now() - timedelta(days=110)), 'updated_at': iso(now() - timedelta(days=108))},
+        {'id': secrets.token_hex(12), 'title': 'Covenant of Engagement \u2014 Knight',
+         'body': 'PROOF Covenant of Engagement for Amara Knight.',
+         'member_id': amara_member_id, 'athlete_id': athlete_ids[1], 'status': 'sent',
+         'created_by': staff_ids['admin'], 'sent_at': iso(now() - timedelta(days=2)),
+         'signed_at': None, 'signature': None,
+         'created_at': iso(now() - timedelta(days=2)), 'updated_at': iso(now() - timedelta(days=2))},
+    ])
 
     print('[seed] done.')
     print('\nLogin credentials (password = Proof2026!):')

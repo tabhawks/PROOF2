@@ -12,6 +12,8 @@ from routes_admin import router as admin_router
 from routes_cms import router as cms_router
 from routes_ops import router as ops_router
 from routes_public import router as public_router
+from routes_2fa import router as twofa_router
+from routes_billing import router as billing_router
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -38,9 +40,11 @@ async def health():
 
 # Mount sub-routers under /api
 api_router.include_router(auth_router)
+api_router.include_router(twofa_router)
 api_router.include_router(admin_router)
 api_router.include_router(cms_router)
 api_router.include_router(ops_router)
+api_router.include_router(billing_router)
 
 # Public routes (sitemap.xml, robots.txt, page-view tracking) — also exposed via /api for the FastAPI side
 api_router.include_router(public_router)

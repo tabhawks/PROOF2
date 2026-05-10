@@ -39,6 +39,7 @@ export default function PressDetail() {
           </div>
         </section>
       </article>
+      <InlineEditor resourceType="post" slug={slug} />
     </PublicLayout>
   );
 }
